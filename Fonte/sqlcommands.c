@@ -1,4 +1,4 @@
-#include <stdio.h>
+0#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 ////
@@ -331,7 +331,7 @@ int finalizaInsert(char *nome, column *c){
                   return ERRO_CHAVE_PRIMARIA;
               }
             break;
-
+//
             case FK:
               if (tab2[j].chave == 2 && strlen(tab2[j].attApt) != 0 && strlen(tab2[j].tabelaApt) != 0){
                   erro = verificaChaveFK(nome, temp, tab2[j].nome, temp->valorCampo,
