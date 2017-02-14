@@ -1,6 +1,6 @@
 #include "filemanager.h"
 #include <stdio.h> // para entrada e saida
-#include <stdlib.h>	// alocação de memória
+//	#include <stdlib.h>	// alocação de memória
 #include <string.h> // manipulação de string
 
 int novo_indice(const char * nome, int indice, int offset) { // adiciona a nova tupla no final do arquivo
@@ -18,7 +18,7 @@ int novo_indice(const char * nome, int indice, int offset) { // adiciona a nova 
 	
 	// cria o arquivo necessário para a primeira inserção, se o mesmo não existir
 	if (arq_indice == NULL) { 
-    	printf("Falha ao abrir o arquivo de índices, criando novo .index\n");
+    	printf("Falha ao abrir o arquivo %s, criando novo .index\n", nome_arq);
     	arq_indice = fopen(nome_arq,"w+"); // w+ (leitura e escrita), o arquivo é criado
     	// aloca espaço para os dados a serem inseridos (2 inteiros, indice e offset da tupla no .dat)
     }
@@ -51,7 +51,7 @@ void le_entradas(const char * nome) {
 	arq_indice = fopen(nome_arq,"r+"); // r+ (leitura e escrita), o arquivo deve existir nesse modo
 	
 	if (arq_indice == NULL) { 
-    	printf("Falha ao abrir o arquivo de índices para leitura.\n");
+    	printf("Falha ao abrir o arquivo de índices %s para leitura.\n", nome_arq);
     	err++;
     	return;
     }
@@ -63,6 +63,8 @@ void le_entradas(const char * nome) {
 	while (1) {
 		if (fread(&dupla.index, sizeof(int), 1, arq_indice) != 1) {err++; break;};
 		if (fread(&dupla.offset, sizeof(int), 1, arq_indice) != 1) {err++; break;};
+		
+		// debbug
 		printf("%d\n", dupla.index);
 		printf("%d\n", dupla.offset);
 

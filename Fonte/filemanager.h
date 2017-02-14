@@ -6,7 +6,7 @@ typedef struct _entrada_indice {
 	int offset;
 } Tpindex;
 
-
+// funciona recebendo tupla por tupla da árvore
 // recebe o nome do arquivo .index, se este não existe então deve ser criado,
 // recebe o indice e o offset a ser adicionado (chave - valor)
 // o arquivo que guarda a (chave - valor) / (indice - offset)
