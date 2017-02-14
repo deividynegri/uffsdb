@@ -2,7 +2,7 @@
 #ifndef FILEMANAGER_H
 
 typedef struct _entrada_indice {
-	int chave;
+	int index;
 	int offset;
 } Tpindex;
 
@@ -15,6 +15,6 @@ typedef struct _entrada_indice {
 int novo_indice(const char * nome, int indice, int offset);
 
 // serve para ler todas as entradas gravadas no .index e alimentar a árvore
-Tpindex le_entradas(FILE * file);
+void le_entradas(const char * nome);
 
 #endif

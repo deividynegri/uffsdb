@@ -18,7 +18,7 @@ int novo_indice(const char * nome, int indice, int offset) { // adiciona a nova 
 	
 	// cria o arquivo necessário para a primeira inserção, se o mesmo não existir
 	if (arq_indice == NULL) { 
-    	printf("Falha ao abrir o arquivo de índices, craindo novo .index\n");
+    	printf("Falha ao abrir o arquivo de índices, criando novo .index\n");
     	arq_indice = fopen(nome_arq,"w+"); // w+ (leitura e escrita), o arquivo é criado
     	// aloca espaço para os dados a serem inseridos (2 inteiros, indice e offset da tupla no .dat)
     }
@@ -36,19 +36,42 @@ int novo_indice(const char * nome, int indice, int offset) { // adiciona a nova 
 	return 0;
 }
 
-Tpindex le_entradas(FILE * file) {
+void le_entradas(const char * nome) {
+
 	int err = 0; // flag para de erros de leitura
+	FILE *arq_indice;
+
+	char dat[7] = ".index";
+	char nome_arq[20];
+
+	//nome real do .index
+	strcpy(nome_arq, nome); //talvez deva ser em lowercase letras (nao consegui compilar strcpylower)
+	strcat(nome_arq, dat); //adiciona ".index\0"
+	//printf("O nome do arquivo é: %s\n", nome_arq);
+	arq_indice = fopen(nome_arq,"r+"); // r+ (leitura e escrita), o arquivo deve existir nesse modo
+	
+	if (arq_indice == NULL) { 
+    	printf("Falha ao abrir o arquivo de índices para leitura.\n");
+    	err++;
+    	return;
+    }
+
 	Tpindex dupla;
-	fseek(file, 0, SEEK_SET); // início do arquivo .index
-	if (fread(&dupla.index, sizeof(int), 1, file) != 1) {err++; break;};
-	if (fread(&dupla.offset, sizeof(int), 1, file) != 1) {err++; break;};
+	fseek(arq_indice, 0, SEEK_SET); // início do arquivo .index
 	
 
+	while (1) {
+		if (fread(&dupla.index, sizeof(int), 1, arq_indice) != 1) {err++; break;};
+		if (fread(&dupla.offset, sizeof(int), 1, arq_indice) != 1) {err++; break;};
+		printf("%d\n", dupla.index);
+		printf("%d\n", dupla.offset);
+
+		/*
+		 chamada de função que adiciona o nodo na árvore
+		insert_arvore(dupla.index e dupla.offset)
+		*/
+	}
+	fclose(arq_indice);
+	printf("A alimentação da árvore terminou.\n");
+	return;
 }
-
-
-
-
-
-
-
