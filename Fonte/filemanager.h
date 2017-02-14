@@ -1,10 +1,10 @@
 #include <stdio.h>
 #ifndef FILEMANAGER_H
 
-typedef struct entrada_indice {
+typedef struct _entrada_indice {
 	int chave;
 	int offset;
-} entrada_indice;
+} Tpindex;
 
 
 // recebe o nome do arquivo .index, se este não existe então deve ser criado,
@@ -14,6 +14,7 @@ typedef struct entrada_indice {
 // este formato se extenderá conforme a quantidade de tuplas até o final do arquivo.
 int novo_indice(const char * nome, int indice, int offset);
 
-entrada_indice ler_entrada(FILE * file);
+// serve para ler todas as entradas gravadas no .index e alimentar a árvore
+Tpindex le_entradas(FILE * file);
 
 #endif

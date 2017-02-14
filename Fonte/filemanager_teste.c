@@ -1,11 +1,10 @@
 #include <stdio.h>
 #include "filemanager.h"
 
-
-
 int main () {
-	//novo_indice("");
-	
-	printf("fim\n");
+	// cria um .index com esse nome
+	novo_indice("teste", 10, 20);
+
+	//printf("Fim\n");
 	return 0;
 }
