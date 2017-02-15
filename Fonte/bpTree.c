@@ -1380,7 +1380,7 @@ node * destroy_tree(node * root) {
 
 // MAIN
 
-int main( int argc, char ** argv ) {
+int btree( int argc, char ** argv ) {
 
 	char * input_file;
 	FILE * fp;
