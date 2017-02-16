@@ -1229,8 +1229,7 @@ int bpTree( int argc, char ** argv ) {
 			find_and_print_range(root, input, range2, instruction == 'p');
 			break;
 		case 'l':
-			//print_leaves(root);
-			save_leaves( root, "andre" );
+			print_leaves(root);
 
 			break;
 		case 'q':
