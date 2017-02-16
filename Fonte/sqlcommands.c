@@ -319,6 +319,21 @@ int finalizaInsert(char *nome, column *c){
     tab->esquema = abreTabela(nome, &objeto, &tab->esquema);
     tab2 = procuraAtributoFK(objeto);
 
+    char directory[LEN_DB_NAME_IO];
+    strcpy(directory, connected.db_directory);
+    strcat(directory, dicio.nArquivo);
+
+    if((dados = fopen(directory,"a")) == NULL){
+      printf("ERROR: cannot open file.\n");
+      free(auxT); // Libera a memoria da estrutura.
+      free(temp); // Libera a memoria da estrutura.
+      free(tab); // Libera a memoria da estrutura.
+      free(tab2); // Libera a memoria da estrutura.
+      return ERRO_ABRIR_ARQUIVO;
+     }
+//     while(!feof(dados)){
+  //     fseek(dados,1,1);
+  //   }
     for(j = 0, temp = c; j < objeto.qtdCampos && temp != NULL; j++, temp = temp->next){
         switch(tab2[j].chave){
             case NPK:
@@ -342,8 +357,8 @@ int finalizaInsert(char *nome, column *c){
                     return ERRO_CHAVE_PRIMARIA;
                   }
               }
-              raiz=insertBP(raiz, atoi(temp->valorCampo), atoi(temp->valorCampo));
-              
+              raiz=insertBP(raiz, atoi(temp->valorCampo), ftell(dados));
+
 
             break;
 
@@ -367,9 +382,11 @@ int finalizaInsert(char *nome, column *c){
               return ERRO_CHAVE_ESTRANGEIRA;
         }
     }
-    save_leaves(raiz, nomenovo);
+    if(nomenovo!=NULL)
+      save_leaves(raiz, nomenovo);
     raiz=NULL;
     raizFK=NULL;
+    fclose(dados);
 
     if (erro == ERRO_CHAVE_ESTRANGEIRA){
       printf("ERROR: unknown foreign key error.\n");
@@ -397,10 +414,6 @@ int finalizaInsert(char *nome, column *c){
       free(tab2); // Libera a memoria da estrutura.
       return ERRO_DE_PARAMETRO;
     }
-
-    char directory[LEN_DB_NAME_IO];
-    strcpy(directory, connected.db_directory);
-    strcat(directory, dicio.nArquivo);
 
     if((dados = fopen(directory,"a+b")) == NULL){
       printf("ERROR: cannot open file.\n");
@@ -529,7 +542,7 @@ void insert(rc_insert *s_insert) {
 					flag=1;
 				}
 			}
-		} 
+		}
     else {
 			flag = 1;
 		}
@@ -964,7 +977,7 @@ int excluirTabela(char *nomeTabela) {
 
     char nomeindex[LEN_DB_NAME_IO*2];
     memset(nomeindex, '\0', LEN_DB_NAME_IO*2);
-    
+
 
     if((dicionario = fopen(directory,"a+b")) == NULL)
         return ERRO_ABRIR_ARQUIVO;

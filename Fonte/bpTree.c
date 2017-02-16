@@ -153,9 +153,9 @@ void save_leaves( node * root, char * nome ) {
 		c = c->pointers[0];
 	while (true) {
 		for (i = 0; i < c->num_keys; i++) {
-			novo_indice( nome, c->keys[i], c->keys[i]);
+			novo_indice( nome, c->keys[i], ((record*)c->pointers[i])->value);
 		}
-		
+
 		if (c->pointers[order - 1] != NULL) {
 			c = c->pointers[order - 1];
 		}
@@ -196,7 +196,7 @@ int path_to_root( node * root, node * child ) {
 
 
 /* Prints the B+ tree in the command
- * line in level (rank) order, with the 
+ * line in level (rank) order, with the
  * keys in each node and the '|' symbol
  * to separate nodes.
  * With the verbose_output flag set.
@@ -226,7 +226,7 @@ void print_tree( node * root ) {
 				printf("\n");
 			}
 		}
-		if (verbose_output) 
+		if (verbose_output)
 			printf("(%lx)", (unsigned long)n);
 		for (i = 0; i < n->num_keys; i++) {
 			if (verbose_output)
@@ -237,7 +237,7 @@ void print_tree( node * root ) {
 			for (i = 0; i <= n->num_keys; i++)
 				enqueue(n->pointers[i]);
 		if (verbose_output) {
-			if (n->is_leaf) 
+			if (n->is_leaf)
 				printf("%lx ", (unsigned long)n->pointers[order - 1]);
 			else
 				printf("%lx ", (unsigned long)n->pointers[n->num_keys]);
@@ -255,7 +255,7 @@ void find_and_print(node * root, int key, bool verbose) {
 	record * r = find(root, key, verbose);
 	if (r == NULL)
 		printf("Record not found under key %d.\n", key);
-	else 
+	else
 		printf("Record at %lx -- key %d, value %d.\n",
 				(unsigned long)r, key, r->value);
 }
@@ -320,7 +320,7 @@ node * find_leaf( node * root, int key, bool verbose ) {
 	int i = 0;
 	node * c = root;
 	if (c == NULL) {
-		if (verbose) 
+		if (verbose)
 			printf("Empty tree.\n");
 		return c;
 	}
@@ -359,7 +359,7 @@ record * find( node * root, int key, bool verbose ) {
 	if (c == NULL) return NULL;
 	for (i = 0; i < c->num_keys; i++)
 		if (c->keys[i] == key) break;
-	if (i == c->num_keys) 
+	if (i == c->num_keys)
 		return NULL;
 	else
 		return (record *)c->pointers[i];
@@ -432,13 +432,13 @@ node * make_leaf( void ) {
 
 
 /* Helper function used in insert_into_parent
- * to find the index of the parent's pointer to 
+ * to find the index of the parent's pointer to
  * the node to the left of the key to be inserted.
  */
 int get_left_index(node * parent, node * left) {
 
 	int left_index = 0;
-	while (left_index <= parent->num_keys && 
+	while (left_index <= parent->num_keys &&
 			parent->pointers[left_index] != left)
 		left_index++;
 	return left_index;
@@ -544,7 +544,7 @@ node * insert_into_leaf_after_splitting(node * root, node * leaf, int key, recor
  * into a node into which these can fit
  * without violating the B+ tree properties.
  */
-node * insert_into_node(node * root, node * n, 
+node * insert_into_node(node * root, node * n,
 		int left_index, int key, node * right) {
 	int i;
 
@@ -563,7 +563,7 @@ node * insert_into_node(node * root, node * n,
  * into a node, causing the node's size to exceed
  * the order, and causing the node to split into two.
  */
-node * insert_into_node_after_splitting(node * root, node * old_node, int left_index, 
+node * insert_into_node_after_splitting(node * root, node * old_node, int left_index,
 		int key, node * right) {
 
 	int i, j, split, k_prime;
@@ -574,8 +574,8 @@ node * insert_into_node_after_splitting(node * root, node * old_node, int left_i
 	/* First create a temporary set of keys and pointers
 	 * to hold everything in order, including
 	 * the new key and pointer, inserted in their
-	 * correct places. 
-	 * Then create a new node and copy half of the 
+	 * correct places.
+	 * Then create a new node and copy half of the
 	 * keys and pointers to the old node and
 	 * the other half to the new.
 	 */
@@ -607,7 +607,7 @@ node * insert_into_node_after_splitting(node * root, node * old_node, int left_i
 	/* Create the new node and copy
 	 * half the keys and pointers to the
 	 * old and half to the new.
-	 */  
+	 */
 	split = cut(order);
 	new_node = make_node();
 	old_node->num_keys = 0;
@@ -658,23 +658,23 @@ node * insert_into_parent(node * root, node * left, int key, node * right) {
 		return insert_into_new_root(left, key, right);
 
 	/* Case: leaf or node. (Remainder of
-	 * function body.)  
+	 * function body.)
 	 */
 
-	/* Find the parent's pointer to the left 
+	/* Find the parent's pointer to the left
 	 * node.
 	 */
 
 	left_index = get_left_index(parent, left);
 
 
-	/* Simple case: the new key fits into the node. 
+	/* Simple case: the new key fits into the node.
 	 */
 
 	if (parent->num_keys < order - 1)
 		return insert_into_node(root, parent, left_index, key, right);
 
-	/* Harder case:  split a node in order 
+	/* Harder case:  split a node in order
 	 * to preserve the B+ tree properties.
 	 */
 
@@ -750,7 +750,7 @@ node * insertBP( node * root, int key, int value ) {
 	 * Start a new tree.
 	 */
 
-	if (root == NULL) 
+	if (root == NULL)
 		return start_new_tree(key, pointer);
 
 
@@ -792,7 +792,7 @@ int get_neighbor_index( node * n ) {
 
 	/* Return the index of the key to the left
 	 * of the pointer in the parent pointing
-	 * to n.  
+	 * to n.
 	 * If n is the leftmost child, this means
 	 * return -1.
 	 */
@@ -856,10 +856,10 @@ node * adjust_root(node * root) {
 	if (root->num_keys > 0)
 		return root;
 
-	/* Case: empty root. 
+	/* Case: empty root.
 	 */
 
-	// If it has a child, promote 
+	// If it has a child, promote
 	// the first (only) child
 	// as the new root.
 
@@ -967,7 +967,7 @@ node * coalesce_nodes(node * root, node * n, node * neighbor, int neighbor_index
 	root = delete_entry(root, n->parent, k_prime, n);
 	free(n->keys);
 	free(n->pointers);
-	free(n); 
+	free(n);
 	return root;
 }
 
@@ -978,13 +978,13 @@ node * coalesce_nodes(node * root, node * n, node * neighbor, int neighbor_index
  * small node's entries without exceeding the
  * maximum
  */
-node * redistribute_nodes(node * root, node * n, node * neighbor, int neighbor_index, 
-		int k_prime_index, int k_prime) {  
+node * redistribute_nodes(node * root, node * n, node * neighbor, int neighbor_index,
+		int k_prime_index, int k_prime) {
 
 	int i;
 	node * tmp;
 
-	/* Case: n has a neighbor to the left. 
+	/* Case: n has a neighbor to the left.
 	 * Pull the neighbor's last key-pointer pair over
 	 * from the neighbor's right end to n's left end.
 	 */
@@ -1018,7 +1018,7 @@ node * redistribute_nodes(node * root, node * n, node * neighbor, int neighbor_i
 	 * to n's rightmost position.
 	 */
 
-	else {  
+	else {
 		if (n->is_leaf) {
 			n->keys[n->num_keys] = neighbor->keys[0];
 			n->pointers[n->num_keys] = neighbor->pointers[0];
@@ -1067,10 +1067,10 @@ node * delete_entry( node * root, node * n, int key, void * pointer ) {
 
 	n = remove_entry_from_node(n, key, pointer);
 
-	/* Case:  deletion from the root. 
+	/* Case:  deletion from the root.
 	 */
 
-	if (n == root) 
+	if (n == root)
 		return adjust_root(root);
 
 
@@ -1106,7 +1106,7 @@ node * delete_entry( node * root, node * n, int key, void * pointer ) {
 	neighbor_index = get_neighbor_index( n );
 	k_prime_index = neighbor_index == -1 ? 0 : neighbor_index;
 	k_prime = n->parent->keys[k_prime_index];
-	neighbor = neighbor_index == -1 ? n->parent->pointers[1] : 
+	neighbor = neighbor_index == -1 ? n->parent->pointers[1] :
 		n->parent->pointers[neighbor_index];
 
 	capacity = n->is_leaf ? order : order - 1;
@@ -1183,7 +1183,7 @@ int bpTree( int argc, char ** argv ) {
 		}
 	}
 
-	usage_1();  
+	usage_1();
 	usage_2();
 
 	if (argc > 2) {
