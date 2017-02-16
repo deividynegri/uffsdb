@@ -1119,10 +1119,10 @@ void createTable(rc_insert *t) {
     if((objcmp(fkTable, "") != 0) || (objcmp(fkColumn, "") != 0)){
       if((verifyFK(fkTable, fkColumn) == 0) ||  (t->attribute[i] == FK && t->type[i] != 'I')){
   		  if(t->type[i] != 'I')
-          printf("Foreign Key must be and Integer\n");
+          printf("Foreign Key must be an Integer\n");
         else
           printf("ERROR: attribute FK cannot be referenced\n");
-        
+
         free(tableName);
         freeTable(tab);
         return;
