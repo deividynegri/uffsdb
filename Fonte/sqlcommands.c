@@ -1092,6 +1092,13 @@ void createTable(rc_insert *t) {
   }
   int i;
   for(i = 0; i < t->N; i++){
+
+    if (t->attribute[i] == PK && t->type[i] != 'I'){
+        printf("ERROR: attribute Primary key must be an Integer\n");
+        free(tableName);
+        freeTable(tab);
+        return;
+    }
     if(t->type[i] == 'S')
   		size = atoi(t->values[i]);
   	else if(t->type[i] == 'I')
@@ -1110,8 +1117,12 @@ void createTable(rc_insert *t) {
   	}
     tab = adicionaCampo(tab, t->columnName[i], t->type[i], size, t->attribute[i], fkTable, fkColumn);
     if((objcmp(fkTable, "") != 0) || (objcmp(fkColumn, "") != 0)){
-      if(verifyFK(fkTable, fkColumn) == 0){
-  		  printf("ERROR: attribute FK cannot be referenced\n");
+      if((verifyFK(fkTable, fkColumn) == 0) ||  (t->attribute[i] == FK && t->type[i] != 'I')){
+  		  if(t->type[i] != 'I')
+          printf("Foreign Key must be and Integer\n");
+        else
+          printf("ERROR: attribute FK cannot be referenced\n");
+        
         free(tableName);
         freeTable(tab);
         return;
