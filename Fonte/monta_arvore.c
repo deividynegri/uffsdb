@@ -4,7 +4,7 @@
 node * le_entradas(const char * nome) {  // remonta arvore
 	node * raiz=NULL;
 	int err = 0; // flag para de erros de leitura
-	FILE *arq_indice;
+	FILE *arq_indice = NULL;
 
 	char dat[7] = ".index";
 	char nome_arq[(strlen(nome)+7)];

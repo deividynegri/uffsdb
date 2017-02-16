@@ -3,7 +3,7 @@
 
 
 void limpa_arquivo (const char * nome){
-	FILE *arq_indice;
+	FILE *arq_indice = NULL;
 
 	char dat[7] = ".index";
 	char nome_arq[(strlen(nome)+7)];

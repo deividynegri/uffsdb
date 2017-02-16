@@ -302,11 +302,11 @@ int finalizaInsert(char *nome, column *c){
     char * nomenovo=NULL;  // string para caminho do arquivo index
     char * nomenovoFK=NULL;
 
-    node * raiz;     //nodos para raiz da arvore
-    node * raizFK;
-    column *auxC, *temp;
+    node * raiz = NULL;     //nodos para raiz da arvore
+    node * raizFK = NULL;
+    column *auxC = NULL, *temp = NULL;
     int i = 0, x = 0, t, erro, j = 0;
-    FILE *dados;
+    FILE *dados = NULL;
 
     struct fs_objects objeto,dicio; // Le dicionario
     tp_table *auxT ; // Le esquema

@@ -30,7 +30,7 @@ bool verbose_output = false;
 
 // FUNCTION DEFINITIONS.
 
-// OUTPUT AND UTILITIES.
+// OUTPUT AND UTILITIES
 
 
 /* First message to the user.
