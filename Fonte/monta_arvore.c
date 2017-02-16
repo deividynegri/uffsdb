@@ -1,7 +1,7 @@
 #include "monta_arvore.h"
 
 
-node * le_entradas(const char * nome) {
+node * le_entradas(const char * nome) {  // remonta arvore
 	node * raiz=NULL;
 	int err = 0; // flag para de erros de leitura
 	FILE *arq_indice;
@@ -16,7 +16,7 @@ node * le_entradas(const char * nome) {
 	arq_indice = fopen(nome_arq,"r+"); // r+ (leitura e escrita), o arquivo deve existir nesse modo
 	
 	if (arq_indice == NULL) { 
-    	return NULL;
+    	return NULL; // nao existe pk ainda
     }
 
 	Tpindex dupla;
@@ -31,6 +31,6 @@ node * le_entradas(const char * nome) {
 		
 	}
 	fclose(arq_indice);
-	print_leaves(raiz);
+	//print_leaves(raiz);
 	return raiz;
 }

@@ -148,12 +148,12 @@ void save_leaves( node * root, char * nome ) {
 		printf("Empty tree.\n");
 		return;
 	}
-	limpa_arquivo (nome);
+	limpa_arquivo (nome);  // limpa o arquivo de indices para a reescrita
 	while (!c->is_leaf)
 		c = c->pointers[0];
 	while (true) {
 		for (i = 0; i < c->num_keys; i++) {
-			novo_indice( nome, c->keys[i], ((record*)c->pointers[i])->value);
+			novo_indice( nome, c->keys[i], ((record*)c->pointers[i])->value);  // salva chave e valor(offset) no arquvio de indices
 		}
 
 		if (c->pointers[order - 1] != NULL) {

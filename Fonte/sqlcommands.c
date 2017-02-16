@@ -299,10 +299,10 @@ int verificaChavePK(char *nomeTabela, column *c, char *nomeCampo, char *valorCam
 
 /////
 int finalizaInsert(char *nome, column *c){
-    char * nomenovo=NULL;
+    char * nomenovo=NULL;  // string para caminho do arquivo index
     char * nomenovoFK=NULL;
 
-    node * raiz;
+    node * raiz;     //nodos para raiz da arvore
     node * raizFK;
     column *auxC, *temp;
     int i = 0, x = 0, t, erro, j = 0;
@@ -323,7 +323,7 @@ int finalizaInsert(char *nome, column *c){
     strcpy(directory, connected.db_directory);
     strcat(directory, dicio.nArquivo);
 
-    if((dados = fopen(directory,"a")) == NULL){
+    if((dados = fopen(directory,"a")) == NULL){ //abre arquivo de dados no fim 
       printf("ERROR: cannot open file.\n");
       free(auxT); // Libera a memoria da estrutura.
       free(temp); // Libera a memoria da estrutura.
@@ -341,13 +341,14 @@ int finalizaInsert(char *nome, column *c){
             break;
 
             case PK:
+            //concatenar para construcao do caminho para arquivo index
               nomenovo= (char*) malloc ((sizeof (char)*(strlen(nome)))+(sizeof (char)*strlen(connected.db_directory)));
               strcpy(nomenovo, connected.db_directory);
               strcat(nomenovo, nome);
-              raiz=le_entradas(nomenovo);
-              if(raiz!=NULL){
-                  record * r = find(raiz, atoi(temp->valorCampo), 0);//nunca tire esse 0, eu estou avisando, depois não chora!
-                  if (r!=NULL){
+              raiz=le_entradas(nomenovo); // remonta a arvore em memoria 
+              if(raiz!=NULL){  //checa a existencia de um arquivo de indices
+                  record * r = find(raiz, atoi(temp->valorCampo), 0); //checa se existe o registro na arvore de indices
+                  if (r!=NULL){ // se existe ha uma duplicacao de pk
                     printf("ERROR: duplicate key value violates unique constraint \"%s_pkey\"\nDETAIL:  Key (%s)=(%s) already exists.\n", nome, temp->nomeCampo, temp->valorCampo);
 
                     free(auxT); // Libera a memoria da estrutura.
@@ -357,22 +358,24 @@ int finalizaInsert(char *nome, column *c){
                     return ERRO_CHAVE_PRIMARIA;
                   }
               }
-              raiz=insertBP(raiz, atoi(temp->valorCampo), ftell(dados));
+              raiz=insertBP(raiz, atoi(temp->valorCampo), ftell(dados)); // se nao insere na arvore
 
 
             break;
 
             case FK:
+            // concatena para caminho do arquivo de pk da fk
               nomenovoFK= (char*) malloc ((sizeof (char)*(strlen(tab2[j].tabelaApt)))+(sizeof (char)*strlen(connected.db_directory)));
               strcpy(nomenovoFK, connected.db_directory);
               strcat(nomenovoFK, tab2[j].tabelaApt);
-              raizFK=le_entradas(nomenovoFK);
-              if(raizFK!=NULL){
-                record * r = find(raizFK, atoi(temp->valorCampo), 0);//nunca tire esse 0, eu estou avisando, depois não chora!
-                if (r!=NULL){
+              raizFK=le_entradas(nomenovoFK); // remonta arvore da pk da fk
+              if(raizFK!=NULL){  // checa existencia de indices
+                record * r = find(raizFK, atoi(temp->valorCampo), 0); // procura o indice especifico da pk
+                if (r!=NULL){ // se encontrou esta tudo ok
                   break;
                 }
               }
+              // se nao encontrou da erro de fk
               printf("ERROR: invalid reference to \"%s.%s\". The value \"%s\" does not exist.\n", tab2[j].tabelaApt,tab2[j].attApt,temp->valorCampo);
 
               free(auxT); // Libera a memoria da estrutura.
@@ -382,11 +385,11 @@ int finalizaInsert(char *nome, column *c){
               return ERRO_CHAVE_ESTRANGEIRA;
         }
     }
-    if(nomenovo!=NULL)
-      save_leaves(raiz, nomenovo);
+    if(nomenovo!=NULL) // se houve insercao de pk
+      save_leaves(raiz, nomenovo); // reescreve as folhas no arquivo de indice
     raiz=NULL;
     raizFK=NULL;
-    fclose(dados);
+    fclose(dados); // fecha a tabela dat
 
     if (erro == ERRO_CHAVE_ESTRANGEIRA){
       printf("ERROR: unknown foreign key error.\n");
@@ -1040,7 +1043,7 @@ int excluirTabela(char *nomeTabela) {
     remove(directory);
     strcpy(nomeindex, connected.db_directory);
     strcat(nomeindex, stt);
-    remove(nomeindex);
+    remove(nomeindex);  // exclui arquivos .index
     free(bufferpoll);
     printf("DROP TABLE\n");
     return SUCCESS;
