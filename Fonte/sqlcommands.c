@@ -1,3 +1,4 @@
+#include "sqlcommands.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -298,6 +299,11 @@ int verificaChavePK(char *nomeTabela, column *c, char *nomeCampo, char *valorCam
 
 /////
 int finalizaInsert(char *nome, column *c){
+    char * nomenovo=NULL;
+    char * nomenovoFK=NULL;
+
+    node * raiz;
+    node * raizFK;
     column *auxC, *temp;
     int i = 0, x = 0, t, erro, j = 0;
     FILE *dados;
@@ -320,35 +326,50 @@ int finalizaInsert(char *nome, column *c){
             break;
 
             case PK:
-              erro = verificaChavePK(nome, temp , temp->nomeCampo, temp->valorCampo);
-              if (erro == ERRO_CHAVE_PRIMARIA){
-                  printf("ERROR: duplicate key value violates unique constraint \"%s_pkey\"\nDETAIL:  Key (%s)=(%s) already exists.\n", nome, temp->nomeCampo, temp->valorCampo);
+              nomenovo= (char*) malloc ((sizeof (char)*(strlen(nome)))+(sizeof (char)*strlen(connected.db_directory)));
+              strcpy(nomenovo, connected.db_directory);
+              strcat(nomenovo, nome);
+              raiz=le_entradas(nomenovo);
+              if(raiz!=NULL){
+                  record * r = find(raiz, atoi(temp->valorCampo), 0);//nunca tire esse 0, eu estou avisando, depois não chora!
+                  if (r!=NULL){
+                    printf("ERROR: duplicate key value violates unique constraint \"%s_pkey\"\nDETAIL:  Key (%s)=(%s) already exists.\n", nome, temp->nomeCampo, temp->valorCampo);
 
-				          free(auxT); // Libera a memoria da estrutura.
-				          //free(temp); // Libera a memoria da estrutura.
-				          free(tab); // Libera a memoria da estrutura.
-				          free(tab2); // Libera a memoria da estrutura.
-                  return ERRO_CHAVE_PRIMARIA;
-              }
-            break;
-//
-            case FK:
-              if (tab2[j].chave == 2 && strlen(tab2[j].attApt) != 0 && strlen(tab2[j].tabelaApt) != 0){
-                  erro = verificaChaveFK(nome, temp, tab2[j].nome, temp->valorCampo,
-                                          tab2[j].tabelaApt, tab2[j].attApt);
-                  if (erro != SUCCESS){
-                      printf("ERROR: invalid reference to \"%s.%s\". The value \"%s\" does not exist.\n", tab2[j].tabelaApt,tab2[j].attApt,temp->valorCampo);
-
-          						free(auxT); // Libera a memoria da estrutura.
-          						free(temp); // Libera a memoria da estrutura.
-                      free(tab); // Libera a memoria da estrutura.
-					            free(tab2); // Libera a memoria da estrutura.
-                      return ERRO_CHAVE_ESTRANGEIRA;
+                    free(auxT); // Libera a memoria da estrutura.
+                    //free(temp); // Libera a memoria da estrutura.
+                    free(tab); // Libera a memoria da estrutura.
+                    free(tab2); // Libera a memoria da estrutura.
+                    return ERRO_CHAVE_PRIMARIA;
                   }
               }
+              raiz=insertBP(raiz, atoi(temp->valorCampo), atoi(temp->valorCampo));
+              
+
             break;
+
+            case FK:
+              nomenovoFK= (char*) malloc ((sizeof (char)*(strlen(tab2[j].tabelaApt)))+(sizeof (char)*strlen(connected.db_directory)));
+              strcpy(nomenovoFK, connected.db_directory);
+              strcat(nomenovoFK, tab2[j].tabelaApt);
+              raizFK=le_entradas(nomenovoFK);
+              if(raizFK!=NULL){
+                record * r = find(raizFK, atoi(temp->valorCampo), 0);//nunca tire esse 0, eu estou avisando, depois não chora!
+                if (r!=NULL){
+                  break;
+                }
+              }
+              printf("ERROR: invalid reference to \"%s.%s\". The value \"%s\" does not exist.\n", tab2[j].tabelaApt,tab2[j].attApt,temp->valorCampo);
+
+              free(auxT); // Libera a memoria da estrutura.
+              free(temp); // Libera a memoria da estrutura.
+              free(tab); // Libera a memoria da estrutura.
+              free(tab2); // Libera a memoria da estrutura.
+              return ERRO_CHAVE_ESTRANGEIRA;
         }
     }
+    save_leaves(raiz, nomenovo);
+    raiz=NULL;
+    raizFK=NULL;
 
     if (erro == ERRO_CHAVE_ESTRANGEIRA){
       printf("ERROR: unknown foreign key error.\n");
@@ -470,7 +491,7 @@ int finalizaInsert(char *nome, column *c){
             fwrite(&valorChar,sizeof(valorChar),1,dados);
         }
 
-    }
+  }
 
   fclose(dados);
   free(tab); // Libera a memoria da estrutura.
@@ -508,7 +529,7 @@ void insert(rc_insert *s_insert) {
 					flag=1;
 				}
 			}
-		}
+		} 
     else {
 			flag = 1;
 		}
@@ -907,8 +928,11 @@ int excluirTabela(char *nomeTabela) {
     tp_table *esquema, *esquema1;
     int x,erro, i, j, k, l, qtTable;
     char str[20];
+    char stt[20];
     char dat[5] = ".dat";
+    char ind[7] = ".index";
     memset(str, '\0', 20);
+    memset(stt, '\0', 20);
 
     if (!verificaNomeTabela(nomeTabela)) {
         printf("ERROR: table \"%s\" does not exist.\n", nomeTabela);
@@ -917,6 +941,8 @@ int excluirTabela(char *nomeTabela) {
 
     strcpylower(str, nomeTabela);
     strcat(str, dat);              //Concatena e junta o nome com .dat
+    strcpylower(stt, nomeTabela);
+    strcat(stt, ind);
 
     abreTabela(nomeTabela, &objeto, &esquema);
     qtTable = quantidadeTabelas();
@@ -935,6 +961,10 @@ int excluirTabela(char *nomeTabela) {
     memset(directory, '\0', LEN_DB_NAME_IO*2);
     strcpy(directory, connected.db_directory);
     strcat(directory, "fs_object.dat");
+
+    char nomeindex[LEN_DB_NAME_IO*2];
+    memset(nomeindex, '\0', LEN_DB_NAME_IO*2);
+    
 
     if((dicionario = fopen(directory,"a+b")) == NULL)
         return ERRO_ABRIR_ARQUIVO;
@@ -995,6 +1025,9 @@ int excluirTabela(char *nomeTabela) {
    	strcpy(directory, connected.db_directory);
     strcat(directory, str);
     remove(directory);
+    strcpy(nomeindex, connected.db_directory);
+    strcat(nomeindex, stt);
+    remove(nomeindex);
     free(bufferpoll);
     printf("DROP TABLE\n");
     return SUCCESS;

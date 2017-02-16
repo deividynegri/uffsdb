@@ -1,5 +1,9 @@
 #define FSQLCOMMANDS 1   // flag para garantir a não reinclusão
 
+#include "filemanager.h"
+#include "monta_arvore.h"
+#include "bpTree.h"
+
 #ifndef FMACROS // garante que macros.h não seja reincluída
    #include "macros.h"
 #endif
